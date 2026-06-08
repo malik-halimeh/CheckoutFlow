@@ -4,71 +4,239 @@
  * Step 2 of the checkout: collects full shipping/billing address.
  *
  * Fields:
- *  - Street Address    (required)
- *  - Address Line 2    (optional)
- *  - City              (required)
- *  - State / Province  (required)
- *  - Postal Code       (required, format-validated)
- *  - Country           (required, dropdown)
+ * - Street Address    (required)
+ * - Address Line 2    (optional)
+ * - City              (required)
+ * - State / Province  (required)
+ * - Postal Code       (required, format-validated)
+ * - Country           (required, dropdown with type-ahead buffer)
  *
  * Validation mirrors the PersonalInfoForm pattern:
- *  real-time → blur → submit-time
+ * real-time → blur → submit-time
  *
  * Bootstrap Concepts:
- *  - .row .col-md-6    →  two-column layout on medium+ screens
- *  - .form-select      →  Bootstrap-styled <select> element
- *  - .form-label       →  bold label above inputs
- *  - .is-invalid / .invalid-feedback → error display
+ * - .row .col-md-6    →  two-column layout on medium+ screens
+ * - .form-select      →  Bootstrap-styled <select> element
+ * - .form-label       →  bold label above inputs
+ * - .is-invalid / .invalid-feedback → error display
  */
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import {
   validateRequiredField,
   validatePostalCode,
 } from "../utils/validation";
 
-// A concise list of countries for the dropdown.
-// A production app would import a full ISO 3166 list.
+// Comprehensive, alphabetically sorted list of global countries
 const COUNTRIES = [
-  "United States",
-  "United Kingdom",
-  "Canada",
-  "Australia",
-  "Germany",
-  "France",
-  "Japan",
-  "India",
-  "Brazil",
-  "South Africa",
-  "New Zealand",
-  "Netherlands",
-  "Sweden",
-  "Norway",
-  "Denmark",
-  "Switzerland",
-  "Spain",
-  "Italy",
-  "Portugal",
-  "Mexico",
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "Andorra",
+  "Angola",
+  "Antigua and Barbuda",
   "Argentina",
-  "South Korea",
+  "Armenia",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bhutan",
+  "Bolivia",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Brazil",
+  "Brunei",
+  "Bulgaria",
+  "Burkina Faso",
+  "Burundi",
+  "Cabo Verde",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Central African Republic",
+  "Chad",
+  "Chile",
+  "China",
+  "Colombia",
+  "Comoros",
+  "Congo",
+  "Costa Rica",
+  "Croatia",
+  "Cuba",
+  "Cyprus",
+  "Czechia",
+  "Denmark",
+  "Djibouti",
+  "Dominica",
+  "Dominican Republic",
+  "Ecuador",
+  "Egypt",
+  "El Salvador",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Eswatini",
+  "Ethiopia",
+  "Fiji",
+  "Finland",
+  "France",
+  "Gabon",
+  "Gambia",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Greece",
+  "Grenada",
+  "Guatemala",
+  "Guinea",
+  "Guinea-Bissau",
+  "Guyana",
+  "Haiti",
+  "Honduras",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran",
+  "Iraq",
+  "Ireland",
+  "Israel",
+  "Italy",
+  "Jamaica",
+  "Japan",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Kiribati",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Laos",
+  "Latvia",
+  "Lebanon",
+  "Lesotho",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands",
+  "Mauritania",
+  "Mauritius",
+  "Mexico",
+  "Micronesia",
+  "Moldova",
+  "Monaco",
+  "Mongolia",
+  "Montenegro",
+  "Morocco",
+  "Mozambique",
+  "Myanmar",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "Netherlands",
+  "New Zealand",
+  "Nicaragua",
+  "Niger",
+  "Nigeria",
+  "North Korea",
+  "North Macedonia",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Palestine",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Philippines",
+  "Poland",
+  "Portugal",
+  "Qatar",
+  "Romania",
+  "Russia",
+  "Rwanda",
+  "Saint Kitts and Nevis",
+  "Saint Lucia",
+  "Saint Vincent and the Grenadines",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
   "Singapore",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Korea",
+  "South Sudan",
+  "Spain",
+  "Sri Lanka",
+  "Sudan",
+  "Suriname",
+  "Sweden",
+  "Switzerland",
+  "Syria",
+  "Taiwan",
+  "Tajikistan",
+  "Tanzania",
+  "Thailand",
+  "Timor-Leste",
+  "Togo",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Turkmenistan",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
   "United Arab Emirates",
-  "Other",
+  "United Kingdom",
+  "United States",
+  "Uruguay",
+  "Uzbekistan",
+  "Vanuatu",
+  "Vatican City",
+  "Venezuela",
+  "Vietnam",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe",
 ];
 
 /**
  * AddressForm
  *
  * Props:
- *  @param {Object}   data     – address fields from formData.address
- *  @param {Object}   errors   – errors from useCheckoutForm (submit-time)
- *  @param {Function} onChange – updateAddress from the hook
- *  @param {Function} onNext   – advances to Payment step
- *  @param {Function} onBack   – returns to Personal Info step
+ * @param {Object}   data     – address fields from formData.address
+ * @param {Object}   errors   – errors from useCheckoutForm (submit-time)
+ * @param {Function} onChange – updateAddress from the hook
+ * @param {Function} onNext   – advances to Payment step
+ * @param {Function} onBack   – returns to Personal Info step
  */
 const AddressForm = ({ data, errors, onChange, onNext, onBack }) => {
-  // Tracks which fields have been interacted with (same pattern as PersonalInfoForm)
+  // Tracks which fields have been interacted with
   const [touched, setTouched] = useState({
     street: false,
     city: false,
@@ -78,6 +246,10 @@ const AddressForm = ({ data, errors, onChange, onNext, onBack }) => {
   });
 
   const [localErrors, setLocalErrors] = useState({});
+
+  // Refs to manage quick-typing search buffer without triggering continuous re-renders
+  const searchBufferRef = useRef("");
+  const bufferTimeoutRef = useRef(null);
 
   /**
    * Field-level validator – maps field names to their validation functions.
@@ -96,7 +268,6 @@ const AddressForm = ({ data, errors, onChange, onNext, onBack }) => {
     } else if (labels[field]) {
       error = validateRequiredField(value, labels[field]);
     }
-    // addressLine2 is optional – never an error
 
     setLocalErrors((prev) => ({ ...prev, [field]: error }));
   }, []);
@@ -117,6 +288,43 @@ const AddressForm = ({ data, errors, onChange, onNext, onBack }) => {
       validateField(name, value);
     },
     [validateField]
+  );
+
+  /**
+   * Intercepts keystrokes on the select menu to implement multi-character type-ahead logic.
+   */
+  const handleCountryKeyDown = useCallback(
+    (e) => {
+      // Capture standard alphanumeric keys and spaces, ignoring modifications or command keys
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+
+        // Clear ongoing clearing timeout
+        if (bufferTimeoutRef.current) {
+          clearTimeout(bufferTimeoutRef.current);
+        }
+
+        // Accumulate keystroke into search buffer
+        searchBufferRef.current += e.key;
+        const currentSearch = searchBufferRef.current.toLowerCase();
+
+        // Match first country starting with the accumulated prefix
+        const matchedCountry = COUNTRIES.find((country) =>
+          country.toLowerCase().startsWith(currentSearch)
+        );
+
+        if (matchedCountry) {
+          onChange({ country: matchedCountry });
+          if (touched.country) validateField("country", matchedCountry);
+        }
+
+        // Reset the input buffer after 1000ms of typing inactivity
+        bufferTimeoutRef.current = setTimeout(() => {
+          searchBufferRef.current = "";
+        }, 1000);
+      }
+    },
+    [onChange, touched.country, validateField]
   );
 
   const allErrors = { ...localErrors, ...errors };
@@ -148,16 +356,17 @@ const AddressForm = ({ data, errors, onChange, onNext, onBack }) => {
         onSubmit={(e) => {
           e.preventDefault();
           setTouched({
-            street: true, city: true, state: true,
-            postalCode: true, country: true,
+            street: true,
+            city: true,
+            state: true,
+            postalCode: true,
+            country: true,
           });
           onNext();
         }}
         aria-label="Address information form"
       >
-        {/* ---- Semantic HTML: <fieldset> groups related fields ---- */}
         <fieldset className="mb-2">
-          {/* <legend> provides an accessible group label for screen readers */}
           <legend className="fieldset-legend">Shipping / Billing Address</legend>
 
           {/* Street Address */}
@@ -295,7 +504,6 @@ const AddressForm = ({ data, errors, onChange, onNext, onBack }) => {
               <label htmlFor="country" className="form-label">
                 Country <span className="required-star" aria-hidden="true">*</span>
               </label>
-              {/* Bootstrap Concept – .form-select styles <select> elements */}
               <select
                 id="country"
                 name="country"
@@ -303,6 +511,7 @@ const AddressForm = ({ data, errors, onChange, onNext, onBack }) => {
                 value={data.country}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                onKeyDown={handleCountryKeyDown}
                 required
                 autoComplete="country-name"
                 aria-describedby={getError("country") ? "country-error" : undefined}
@@ -310,7 +519,9 @@ const AddressForm = ({ data, errors, onChange, onNext, onBack }) => {
               >
                 <option value="">Select a country…</option>
                 {COUNTRIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
               {getError("country") && (
