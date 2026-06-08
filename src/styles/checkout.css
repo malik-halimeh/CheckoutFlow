@@ -1,0 +1,1245 @@
+/**
+ * checkout.css
+ *
+ * Complete Neo-Brutalist design system for the CheckoutFlow application.
+ *
+ * Neo-Brutalist visual characteristics implemented here:
+ *  - Thick borders (4–6px solid black/dark)
+ *  - Strong layered box-shadows that simulate depth offset
+ *  - Sharp corners (no border-radius)
+ *  - Large, bold typography with tight tracking
+ *  - High contrast colour palette
+ *  - Spacious, breathing layouts
+ *  - Aggressive hover/focus states
+ *
+ * The stylesheet is organised into:
+ *  1. Custom Properties (design tokens)
+ *  2. Base / Reset overrides
+ *  3. Layout & Container
+ *  4. Stepper
+ *  5. Form elements
+ *  6. Cards & Panels
+ *  7. Buttons
+ *  8. Loading overlay
+ *  9. Result screens (Success / Failure)
+ * 10. Responsive breakpoints (mobile-first)
+ */
+
+/* ==========================================================================
+   1. DESIGN TOKENS — Custom Properties
+   Neo-Brutalist palette: warm off-white background, deep black borders,
+   strong accent colours, and layered shadows.
+   ========================================================================== */
+
+:root {
+  /* Colour Palette */
+  --nb-bg: #FFFDF5;
+  --nb-surface: #FFFFFF;
+  --nb-text: #1A1A1A;
+  --nb-text-secondary: #4A4A4A;
+  --nb-text-muted: #7A7A7A;
+  --nb-border: #1A1A1A;
+  --nb-border-width: 4px;
+
+  /* Accent colours – a warm yellow primary paired with supporting tones */
+  --nb-accent: #FFD60A;
+  --nb-accent-hover: #FFC300;
+  --nb-accent-text: #1A1A1A;
+  --nb-primary: #2D5BFF;
+  --nb-primary-hover: #1A43CC;
+  --nb-primary-text: #FFFFFF;
+  --nb-success: #00C853;
+  --nb-success-bg: #E8F5E9;
+  --nb-danger: #FF1744;
+  --nb-danger-bg: #FFEBEE;
+  --nb-danger-hover: #D50000;
+  --nb-warning: #FF9100;
+  --nb-info: #00B0FF;
+
+  /* Shadows – layered offset for depth (signature Neo-Brutalist look) */
+  --nb-shadow: 6px 6px 0 var(--nb-border);
+  --nb-shadow-sm: 4px 4px 0 var(--nb-border);
+  --nb-shadow-hover: 8px 8px 0 var(--nb-border);
+  --nb-shadow-active: 2px 2px 0 var(--nb-border);
+
+  /* Typography */
+  --nb-font: 'Space Grotesk', 'Inter', system-ui, -apple-system, sans-serif;
+  --nb-font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --nb-font-size-xs: 0.75rem;
+  --nb-font-size-sm: 0.875rem;
+  --nb-font-size-base: 1rem;
+  --nb-font-size-lg: 1.125rem;
+  --nb-font-size-xl: 1.5rem;
+  --nb-font-size-2xl: 2rem;
+  --nb-font-size-3xl: 2.5rem;
+  --nb-font-size-4xl: 3.5rem;
+
+  /* Spacing */
+  --nb-space-xs: 0.25rem;
+  --nb-space-sm: 0.5rem;
+  --nb-space-md: 1rem;
+  --nb-space-lg: 1.5rem;
+  --nb-space-xl: 2rem;
+  --nb-space-2xl: 3rem;
+  --nb-space-3xl: 4rem;
+
+  /* Transitions */
+  --nb-transition: 150ms ease-in-out;
+}
+
+
+/* ==========================================================================
+   2. BASE / RESET OVERRIDES
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-base);
+  line-height: 1.6;
+  color: var(--nb-text);
+  background-color: var(--nb-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* ==========================================================================
+   3. LAYOUT & CONTAINER
+   ========================================================================== */
+
+/* Main application wrapper – centres the checkout card on screen */
+.checkout-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--nb-space-xl) var(--nb-space-md);
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255, 214, 10, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(45, 91, 255, 0.06) 0%, transparent 50%),
+    var(--nb-bg);
+}
+
+/* Header bar at the top of the page */
+.checkout-header {
+  text-align: center;
+  margin-bottom: var(--nb-space-xl);
+  width: 100%;
+  max-width: 800px;
+}
+
+.checkout-brand {
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-xl);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--nb-text);
+  text-transform: uppercase;
+  border-bottom: var(--nb-border-width) solid var(--nb-border);
+  padding-bottom: var(--nb-space-sm);
+  display: inline-block;
+}
+
+/* The main card that contains all checkout content */
+.checkout-container {
+  width: 100%;
+  max-width: 800px;
+  background: var(--nb-surface);
+  border: var(--nb-border-width) solid var(--nb-border);
+  box-shadow: var(--nb-shadow);
+  padding: var(--nb-space-2xl);
+  position: relative;
+}
+
+.checkout-container::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  height: 8px;
+  background: var(--nb-accent);
+  border: var(--nb-border-width) solid var(--nb-border);
+  border-bottom: none;
+}
+
+/* Footer with security / branding */
+.checkout-footer {
+  text-align: center;
+  margin-top: var(--nb-space-xl);
+  padding-top: var(--nb-space-md);
+  color: var(--nb-text-muted);
+  font-size: var(--nb-font-size-sm);
+  width: 100%;
+  max-width: 800px;
+}
+
+
+/* ==========================================================================
+   4. STEPPER — Progress indicator
+   ========================================================================== */
+
+.checkout-stepper {
+  margin-bottom: var(--nb-space-2xl);
+}
+
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--nb-space-xs);
+  position: relative;
+  z-index: 1;
+}
+
+.stepper-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 3px solid var(--nb-border);
+  background: var(--nb-surface);
+  font-weight: 700;
+  transition: all var(--nb-transition);
+}
+
+.stepper-step.active .stepper-icon {
+  background: var(--nb-accent);
+  box-shadow: var(--nb-shadow-sm);
+  transform: scale(1.1);
+}
+
+.stepper-step.completed .stepper-icon {
+  background: var(--nb-success);
+  color: white;
+}
+
+.stepper-step.upcoming .stepper-icon {
+  opacity: 0.4;
+}
+
+.stepper-label {
+  font-size: var(--nb-font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--nb-text-muted);
+}
+
+.stepper-step.active .stepper-label {
+  color: var(--nb-text);
+}
+
+.stepper-step.completed .stepper-label {
+  color: var(--nb-success);
+}
+
+/* Connector line between steps */
+.stepper-connector {
+  flex: 1;
+  height: 3px;
+  background: #e0e0e0;
+  margin: 0 var(--nb-space-xs);
+  align-self: flex-start;
+  margin-top: 24px;
+  min-width: 30px;
+  transition: background var(--nb-transition);
+}
+
+.stepper-connector.completed {
+  background: var(--nb-success);
+}
+
+/* Progress bar track */
+.stepper-progress-track {
+  width: 100%;
+  height: 6px;
+  background: #e0e0e0;
+  border: 2px solid var(--nb-border);
+  margin-top: var(--nb-space-md);
+  overflow: hidden;
+}
+
+.stepper-progress-fill {
+  height: 100%;
+  background: var(--nb-accent);
+  transition: width 0.4s ease-in-out;
+}
+
+
+/* ==========================================================================
+   5. FORM ELEMENTS
+   ========================================================================== */
+
+/* Step header */
+.form-step-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nb-space-md);
+  margin-bottom: var(--nb-space-xl);
+  padding-bottom: var(--nb-space-lg);
+  border-bottom: 3px solid var(--nb-border);
+}
+
+.step-icon-large {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.form-step-title {
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-2xl);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--nb-text);
+  margin: 0 0 var(--nb-space-xs);
+  line-height: 1.2;
+}
+
+.form-step-subtitle {
+  font-size: var(--nb-font-size-base);
+  color: var(--nb-text-secondary);
+  margin: 0;
+}
+
+/* Form labels */
+.form-label {
+  font-weight: 700;
+  font-size: var(--nb-font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--nb-text);
+  margin-bottom: var(--nb-space-sm);
+  display: block;
+}
+
+.required-star {
+  color: var(--nb-danger);
+  font-weight: 900;
+  margin-left: 2px;
+}
+
+.optional-label {
+  font-weight: 400;
+  text-transform: none;
+  color: var(--nb-text-muted);
+  font-size: var(--nb-font-size-xs);
+}
+
+/* Form inputs — Neo-Brutalist override of Bootstrap .form-control */
+.form-control,
+.form-select {
+  border: 3px solid var(--nb-border) !important;
+  border-radius: 0 !important;
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-base);
+  padding: 0.75rem 1rem;
+  background: var(--nb-surface);
+  color: var(--nb-text);
+  transition: all var(--nb-transition);
+  box-shadow: var(--nb-shadow-sm);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--nb-primary) !important;
+  box-shadow: var(--nb-shadow-sm), 0 0 0 3px rgba(45, 91, 255, 0.2) !important;
+  outline: none;
+}
+
+/* Valid / Invalid states */
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: var(--nb-danger) !important;
+  box-shadow: 4px 4px 0 var(--nb-danger) !important;
+  background-image: none !important;
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+  border-color: var(--nb-success) !important;
+  box-shadow: 4px 4px 0 var(--nb-success) !important;
+  background-image: none !important;
+}
+
+/* Error messages */
+.invalid-feedback {
+  font-size: var(--nb-font-size-sm);
+  font-weight: 600;
+  color: var(--nb-danger);
+  margin-top: var(--nb-space-xs);
+  padding: var(--nb-space-xs) var(--nb-space-sm);
+  background: var(--nb-danger-bg);
+  border-left: 4px solid var(--nb-danger);
+}
+
+.valid-feedback {
+  font-size: var(--nb-font-size-sm);
+  font-weight: 600;
+  color: var(--nb-success);
+  margin-top: var(--nb-space-xs);
+}
+
+/* Hint text below fields */
+.form-hint {
+  font-size: var(--nb-font-size-xs);
+  color: var(--nb-text-muted);
+  margin-top: var(--nb-space-xs);
+}
+
+/* Fieldset / Legend */
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fieldset-legend {
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-lg);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: var(--nb-space-sm);
+  margin-bottom: var(--nb-space-lg);
+  border-bottom: 2px dashed var(--nb-border);
+  width: 100%;
+}
+
+/* Input group addon for card type badge */
+.input-group-text {
+  border: 3px solid var(--nb-border) !important;
+  border-left: none !important;
+  border-radius: 0 !important;
+  background: #f5f5f0;
+  font-weight: 700;
+  font-size: var(--nb-font-size-sm);
+  min-width: 110px;
+  display: flex;
+  justify-content: center;
+}
+
+.card-type-badge.detected {
+  background: var(--nb-accent);
+  color: var(--nb-accent-text);
+  font-weight: 800;
+}
+
+/* Secure badge */
+.secure-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--nb-space-sm);
+  padding: var(--nb-space-sm) var(--nb-space-md);
+  background: #f5f5f0;
+  border: 2px dashed var(--nb-border);
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-secondary);
+}
+
+/* Form navigation actions */
+.form-actions {
+  padding-top: var(--nb-space-lg);
+  border-top: 2px solid #e0e0e0;
+  margin-top: var(--nb-space-lg);
+}
+
+
+/* ==========================================================================
+   6. CARDS & PANELS
+   ========================================================================== */
+
+/* Checkout Summary — step preview cards */
+.checkout-summary-screen {
+  text-align: left;
+}
+
+.display-heading {
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-3xl);
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--nb-text);
+  line-height: 1.1;
+  margin: 0 0 var(--nb-space-md);
+}
+
+.lead-text {
+  font-size: var(--nb-font-size-lg);
+  color: var(--nb-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.summary-badge {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+/* Step preview cards on the summary screen */
+.summary-step-card.card {
+  border: 3px solid var(--nb-border) !important;
+  border-radius: 0 !important;
+  box-shadow: var(--nb-shadow-sm);
+  transition: all var(--nb-transition);
+  overflow: visible;
+}
+
+.summary-step-card.card:hover {
+  box-shadow: var(--nb-shadow-hover);
+  transform: translate(-2px, -2px);
+}
+
+.summary-step-card .card-body {
+  padding: var(--nb-space-xl);
+  text-align: left;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--nb-accent);
+  border: 3px solid var(--nb-border);
+  font-weight: 900;
+  font-size: var(--nb-font-size-sm);
+  margin-bottom: var(--nb-space-sm);
+}
+
+.step-icon {
+  font-size: 2rem;
+  margin-bottom: var(--nb-space-sm);
+}
+
+.step-title {
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-lg);
+  font-weight: 800;
+  margin: 0 0 var(--nb-space-xs);
+  color: var(--nb-text);
+}
+
+.step-description {
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-secondary);
+  margin: 0;
+}
+
+/* Security notice on summary screen */
+.security-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nb-space-md);
+  padding: var(--nb-space-lg);
+  background: #f5f5f0;
+  border: 3px solid var(--nb-border);
+  text-align: left;
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-secondary);
+}
+
+.security-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Confirmation screen — summary cards */
+.summary-card.card {
+  border: 3px solid var(--nb-border) !important;
+  border-radius: 0 !important;
+  box-shadow: var(--nb-shadow-sm);
+  overflow: hidden;
+}
+
+.summary-card .card-header {
+  background: #f5f5f0;
+  border-bottom: 3px solid var(--nb-border) !important;
+  border-radius: 0 !important;
+  padding: var(--nb-space-md) var(--nb-space-lg);
+}
+
+.summary-section-title {
+  font-weight: 800;
+  font-size: var(--nb-font-size-base);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-table {
+  font-size: var(--nb-font-size-sm);
+}
+
+.summary-table th,
+.summary-table td {
+  padding: var(--nb-space-sm) var(--nb-space-lg) !important;
+}
+
+.summary-label {
+  font-weight: 700;
+  color: var(--nb-text-muted);
+  text-transform: uppercase;
+  font-size: var(--nb-font-size-xs);
+  letter-spacing: 0.5px;
+  width: 35%;
+  vertical-align: top;
+}
+
+.summary-value {
+  color: var(--nb-text);
+  font-weight: 500;
+}
+
+/* Masked card display */
+.masked-card code {
+  font-family: var(--nb-font-mono);
+  font-size: var(--nb-font-size-base);
+  letter-spacing: 2px;
+  background: none;
+  padding: 0;
+  color: var(--nb-text);
+}
+
+/* Card network badge in confirmation */
+.card-network-badge {
+  background: var(--nb-accent) !important;
+  color: var(--nb-accent-text) !important;
+  border: 2px solid var(--nb-border);
+  border-radius: 0 !important;
+  font-weight: 800;
+  font-size: var(--nb-font-size-xs);
+  text-transform: uppercase;
+  padding: 2px 8px;
+}
+
+/* Legal text */
+.legal-text {
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-muted);
+  padding: var(--nb-space-md);
+  background: #f5f5f0;
+  border-left: 4px solid var(--nb-border);
+}
+
+
+/* ==========================================================================
+   7. BUTTONS
+   ========================================================================== */
+
+/* Base Neo-Brutalist button styles override Bootstrap */
+.btn {
+  font-family: var(--nb-font);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 0 !important;
+  border: 3px solid var(--nb-border) !important;
+  padding: 0.75rem 1.5rem;
+  position: relative;
+  transition: all var(--nb-transition);
+  cursor: pointer;
+}
+
+/* Primary button */
+.btn-primary {
+  background: var(--nb-primary) !important;
+  color: var(--nb-primary-text) !important;
+  box-shadow: var(--nb-shadow-sm);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: var(--nb-primary-hover) !important;
+  box-shadow: var(--nb-shadow-hover);
+  transform: translate(-2px, -2px);
+}
+
+.btn-primary:active {
+  box-shadow: var(--nb-shadow-active);
+  transform: translate(2px, 2px);
+}
+
+/* Danger button */
+.btn-danger {
+  background: var(--nb-danger) !important;
+  color: white !important;
+  box-shadow: var(--nb-shadow-sm);
+}
+
+.btn-danger:hover,
+.btn-danger:focus-visible {
+  background: var(--nb-danger-hover) !important;
+  box-shadow: var(--nb-shadow-hover);
+  transform: translate(-2px, -2px);
+}
+
+.btn-danger:active {
+  box-shadow: var(--nb-shadow-active);
+  transform: translate(2px, 2px);
+}
+
+/* Outline secondary button */
+.btn-outline-secondary {
+  background: var(--nb-surface) !important;
+  color: var(--nb-text) !important;
+  box-shadow: var(--nb-shadow-sm);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus-visible {
+  background: #f5f5f0 !important;
+  box-shadow: var(--nb-shadow-hover);
+  transform: translate(-2px, -2px);
+}
+
+.btn-outline-secondary:active {
+  box-shadow: var(--nb-shadow-active);
+  transform: translate(2px, 2px);
+}
+
+/* Confirm payment button – uses the accent colour for maximum contrast */
+.btn-confirm {
+  background: var(--nb-accent) !important;
+  color: var(--nb-accent-text) !important;
+  box-shadow: var(--nb-shadow-sm);
+  font-size: var(--nb-font-size-base);
+}
+
+.btn-confirm:hover,
+.btn-confirm:focus-visible {
+  background: var(--nb-accent-hover) !important;
+  box-shadow: var(--nb-shadow-hover);
+  transform: translate(-2px, -2px);
+}
+
+.btn-confirm:active {
+  box-shadow: var(--nb-shadow-active);
+  transform: translate(2px, 2px);
+}
+
+/* Extra-large button for CTAs */
+.btn-xl {
+  padding: 1rem 2rem;
+  font-size: var(--nb-font-size-lg);
+  box-shadow: var(--nb-shadow);
+}
+
+/* Navigation buttons */
+.btn-nav {
+  font-size: var(--nb-font-size-sm);
+  flex-shrink: 0;
+}
+
+/* Edit button on confirmation cards */
+.btn-edit {
+  background: transparent !important;
+  border: 2px solid var(--nb-border) !important;
+  font-size: var(--nb-font-size-xs);
+  padding: 0.25rem 0.75rem;
+  box-shadow: 2px 2px 0 var(--nb-border);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-edit:hover,
+.btn-edit:focus-visible {
+  background: var(--nb-accent) !important;
+  box-shadow: 3px 3px 0 var(--nb-border);
+  transform: translate(-1px, -1px);
+}
+
+.btn-edit:active {
+  box-shadow: 1px 1px 0 var(--nb-border);
+  transform: translate(1px, 1px);
+}
+
+/* Button arrow */
+.btn-arrow {
+  display: inline-block;
+  transition: transform var(--nb-transition);
+}
+
+.btn:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* Focus visible – thick outline for keyboard navigation (WCAG) */
+.btn:focus-visible {
+  outline: 3px solid var(--nb-primary);
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================================
+   8. LOADING OVERLAY
+   ========================================================================== */
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 253, 245, 0.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 400px;
+  padding: var(--nb-space-2xl);
+}
+
+/* Custom Neo-Brutalist spinner (replaces Bootstrap's rounded spinner) */
+.spinner-wrapper {
+  margin-bottom: var(--nb-space-xl);
+}
+
+.checkout-spinner {
+  width: 64px;
+  height: 64px;
+  border: 5px solid var(--nb-border);
+  border-top-color: var(--nb-accent);
+  border-right-color: var(--nb-primary);
+  animation: brutalistSpin 0.8s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes brutalistSpin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-title {
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-2xl);
+  font-weight: 900;
+  margin: 0 0 var(--nb-space-sm);
+}
+
+.loading-subtitle {
+  color: var(--nb-text-secondary);
+  margin: 0 0 var(--nb-space-lg);
+}
+
+/* Animated dots */
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: var(--nb-space-lg);
+}
+
+.loading-dots .dot {
+  width: 12px;
+  height: 12px;
+  background: var(--nb-border);
+  animation: dotBounce 1.4s ease-in-out infinite;
+}
+
+.loading-dots .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.loading-secure {
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-muted);
+  font-weight: 600;
+}
+
+
+/* ==========================================================================
+   9. RESULT SCREENS (Success / Failure)
+   ========================================================================== */
+
+.result-screen {
+  text-align: center;
+  padding: var(--nb-space-xl) 0;
+}
+
+/* Result icon — large circle with icon */
+.result-icon {
+  width: 100px;
+  height: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 900;
+  border: 5px solid var(--nb-border);
+  margin-bottom: var(--nb-space-xl);
+  animation: iconPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.success-icon {
+  background: var(--nb-success);
+  color: white;
+  box-shadow: 6px 6px 0 rgba(0, 200, 83, 0.3);
+}
+
+.failure-icon {
+  background: var(--nb-danger);
+  color: white;
+  box-shadow: 6px 6px 0 rgba(255, 23, 68, 0.3);
+}
+
+@keyframes iconPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.result-title {
+  font-family: var(--nb-font);
+  font-size: var(--nb-font-size-3xl);
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin: 0 0 var(--nb-space-md);
+  outline: none;
+}
+
+.result-subtitle {
+  font-size: var(--nb-font-size-lg);
+  color: var(--nb-text-secondary);
+  max-width: 500px;
+  margin: 0 auto var(--nb-space-xl);
+  line-height: 1.5;
+}
+
+/* Reference number block */
+.reference-block {
+  background: var(--nb-success-bg);
+  border: 3px solid var(--nb-border);
+  box-shadow: var(--nb-shadow-sm);
+  padding: var(--nb-space-xl);
+  margin: 0 auto var(--nb-space-xl);
+  max-width: 400px;
+}
+
+.reference-label {
+  font-size: var(--nb-font-size-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--nb-text-muted);
+  margin: 0 0 var(--nb-space-sm);
+}
+
+.reference-number {
+  font-family: var(--nb-font-mono);
+  font-size: var(--nb-font-size-2xl);
+  font-weight: 700;
+  color: var(--nb-text);
+  display: block;
+  margin-bottom: var(--nb-space-sm);
+  letter-spacing: 3px;
+  background: none;
+  padding: 0;
+}
+
+.reference-hint {
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-muted);
+  margin: 0;
+}
+
+/* "What happens next?" section */
+.next-steps {
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto var(--nb-space-lg);
+  padding: var(--nb-space-lg);
+  background: #f5f5f0;
+  border: 3px solid var(--nb-border);
+}
+
+.next-steps-title {
+  font-size: var(--nb-font-size-base);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--nb-space-md);
+}
+
+.next-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.next-steps-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nb-space-sm);
+  margin-bottom: var(--nb-space-sm);
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-secondary);
+}
+
+.check-icon {
+  color: var(--nb-success);
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+/* Failure-specific styles */
+.failure-details {
+  text-align: left;
+  max-width: 450px;
+  margin: 0 auto var(--nb-space-lg);
+  padding: var(--nb-space-lg);
+  background: var(--nb-danger-bg);
+  border: 3px solid var(--nb-border);
+  box-shadow: var(--nb-shadow-sm);
+}
+
+.failure-details-title {
+  font-size: var(--nb-font-size-base);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--nb-space-md);
+}
+
+.failure-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.failure-steps-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nb-space-md);
+  margin-bottom: var(--nb-space-md);
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-secondary);
+}
+
+.step-bullet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--nb-danger);
+  color: white;
+  font-weight: 900;
+  font-size: var(--nb-font-size-sm);
+  border: 2px solid var(--nb-border);
+  flex-shrink: 0;
+}
+
+.failure-reassurance {
+  font-size: var(--nb-font-size-sm);
+  color: var(--nb-text-muted);
+  font-weight: 500;
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ==========================================================================
+   10. ANIMATIONS
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply entrance animation to steps */
+.checkout-container > section {
+  animation: slideUp 0.4s ease-out;
+}
+
+
+/* ==========================================================================
+   11. RESPONSIVE — Mobile First
+   ========================================================================== */
+
+/* Small screens: 320px+ (base / default) */
+@media (max-width: 575.98px) {
+  .checkout-container {
+    padding: var(--nb-space-lg);
+    box-shadow: var(--nb-shadow-sm);
+  }
+
+  .checkout-container::before {
+    height: 6px;
+  }
+
+  .display-heading {
+    font-size: var(--nb-font-size-2xl);
+  }
+
+  .form-step-title {
+    font-size: var(--nb-font-size-xl);
+  }
+
+  .form-step-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .step-icon-large {
+    font-size: 2rem;
+  }
+
+  .result-title {
+    font-size: var(--nb-font-size-2xl);
+  }
+
+  .result-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 2.5rem;
+  }
+
+  .reference-number {
+    font-size: var(--nb-font-size-xl);
+  }
+
+  .btn-xl {
+    padding: 0.875rem 1.5rem;
+    font-size: var(--nb-font-size-base);
+    width: 100%;
+  }
+
+  .btn-nav {
+    font-size: var(--nb-font-size-xs);
+    padding: 0.625rem 1rem;
+  }
+
+  .stepper-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .stepper-label {
+    font-size: 0.625rem;
+  }
+
+  .stepper-connector {
+    min-width: 16px;
+    margin-top: 18px;
+  }
+
+  .summary-table th,
+  .summary-table td {
+    padding: var(--nb-space-xs) var(--nb-space-sm) !important;
+    font-size: var(--nb-font-size-xs);
+  }
+
+  .summary-label {
+    width: 40%;
+  }
+
+  .summary-card .card-header {
+    padding: var(--nb-space-sm) var(--nb-space-md);
+    flex-direction: column;
+    gap: var(--nb-space-sm);
+  }
+
+  .failure-details,
+  .next-steps,
+  .reference-block {
+    max-width: 100%;
+  }
+}
+
+/* Tablet: 768px+ */
+@media (min-width: 768px) {
+  .checkout-container {
+    padding: var(--nb-space-2xl) var(--nb-space-2xl);
+  }
+
+  .display-heading {
+    font-size: var(--nb-font-size-3xl);
+  }
+}
+
+/* Desktop: 1200px+ */
+@media (min-width: 1200px) {
+  .checkout-app {
+    padding: var(--nb-space-3xl) var(--nb-space-xl);
+  }
+
+  .checkout-container {
+    padding: var(--nb-space-3xl);
+  }
+
+  .display-heading {
+    font-size: var(--nb-font-size-4xl);
+  }
+}
